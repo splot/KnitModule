@@ -1,0 +1,20 @@
+{
+    "name": "splot/knit-module",
+    "description": "Knit integration with Splot Framework.",
+    "keywords": ["orm", "odm"],
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Michał Dudek",
+            "email": "michal@michaldudek.pl"
+        }
+    ],
+    "require": {
+        "php": ">=5.3.3",
+        "michaldudek/knit": "dev-master",
+        "splot/framework": "dev-master"
+    },
+    "autoload": {
+        "psr-0": { "Splot\\KnitModule": "src/" }
+    }
+}

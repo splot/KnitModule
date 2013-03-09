@@ -1,4 +1,4 @@
-knit-module
+Splot Knit Module
 ===========
 
-Knit integration with Splot framework.
+Knit integration with Splot Framework.
