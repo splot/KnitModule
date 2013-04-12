@@ -3,8 +3,7 @@ namespace Splot\KnitModule;
 
 use Splot\Framework\Modules\AbstractModule;
 
-use Knit\AbstractModel;
-use Knit\Store\MySQLStore;
+use Knit\Knit;
 
 class SplotKnitModule extends AbstractModule
 {
@@ -12,15 +11,36 @@ class SplotKnitModule extends AbstractModule
     public function boot() {
         $config = $this->getConfig();
 
-        if ($config->get('enabled')) {
-            $this->container->set('model_store', function($c) use ($config) {
-                $store = $config->get('default_store.class');
-                return new $store($config->get('default_store.host'), $config->get('default_store.user'), $config->get('default_store.password'), $config->get('default_store.database'));
-            }, true, true); 
+        /*****************************************************
+         * SETUP KNIT
+         *****************************************************/
+        $stores = $config->get('stores');
 
-            // by default set default mysql store
-            AbstractModel::_setStore($this->container->get('model_store'));
+        // setup the default store in a special way
+        $defaultStoreConfig = $stores['default'];
+        unset($stores['default']);
+        $defaultStore = new $defaultStoreConfig['class']($defaultStoreConfig['host'], $defaultStoreConfig['user'], $defaultStoreConfig['password'], $defaultStoreConfig['database']);
+        $this->container->set('knit.stores.default', $defaultStore);
+
+        // setup Knit and register it as a service
+        $knit = new Knit($defaultStore);
+        $this->container->set('knit', $knit, true);
+
+        /*****************************************************
+         * ADD OTHER STORES
+         *****************************************************/
+        foreach($stores as $name => $storeConfig) {
+            // instantiate
+            $store = new $storeConfig['class']($storeConfig['host'], $storeConfig['user'], $storeConfig['password'], $storeConfig['database']);
+
+            // register in Knit
+            $knit->registerStore($name, $store);
+
+            // register as a service as well
+            $this->container->set('knit.stores.'. $name, $store, true);
         }
+
+        // @todo Map entity classes to stores using the config.
     }
 
 }
