@@ -2,6 +2,7 @@
 namespace Splot\KnitModule;
 
 use Splot\Framework\Modules\AbstractModule;
+use Splot\Log\LogContainer;
 
 use Knit\Knit;
 
@@ -20,6 +21,7 @@ class SplotKnitModule extends AbstractModule
         $defaultStoreConfig = $stores['default'];
         unset($stores['default']);
         $defaultStore = new $defaultStoreConfig['class']($defaultStoreConfig['host'], $defaultStoreConfig['user'], $defaultStoreConfig['password'], $defaultStoreConfig['database']);
+        $defaultStore->setLogger(LogContainer::create('Knit Default Store'));
         $this->container->set('knit.stores.default', $defaultStore);
 
         // setup Knit and register it as a service
@@ -32,6 +34,7 @@ class SplotKnitModule extends AbstractModule
         foreach($stores as $name => $storeConfig) {
             // instantiate
             $store = new $storeConfig['class']($storeConfig['host'], $storeConfig['user'], $storeConfig['password'], $storeConfig['database']);
+            $store->setLogger(LogContainer::create('Knit Store: '. $name));
 
             // register in Knit
             $knit->registerStore($name, $store);
