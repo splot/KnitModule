@@ -58,7 +58,20 @@ class SplotKnitModule extends AbstractModule
             $this->container->set('knit.stores.'. $name, $store, true);
         }
 
-        // @todo Map entity classes to stores using the config.
+        /*****************************************************
+         * CONFIGURE ENTITIES
+         *****************************************************/
+        $entities = $config->get('entities');
+
+        foreach($entities as $entityClass => $entityConfig) {
+            if (isset($entityConfig['store'])) {
+                $knit->setStoreNameForEntity($entityClass, $entityConfig['store']);
+            }
+
+            if (isset($entityConfig['repository'])) {
+                $knit->setRepositoryClassForEntity($entityClass, $entityConfig['repository']);
+            }
+        }
     }
 
 }
