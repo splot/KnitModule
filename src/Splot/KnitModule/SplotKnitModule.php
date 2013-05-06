@@ -22,7 +22,7 @@ class SplotKnitModule extends AbstractModule
         // setup the default store in a special way
         $defaultStoreConfig = $stores['default'];
         unset($stores['default']);
-        $defaultStore = new $defaultStoreConfig['class']($defaultStoreConfig['host'], $defaultStoreConfig['user'], $defaultStoreConfig['password'], $defaultStoreConfig['database']);
+        $defaultStore = new $defaultStoreConfig['class']($defaultStoreConfig);
         $defaultStore->setLogger($loggerFactory->create('Knit Default Store'));
         $this->container->set('knit.stores.default', $defaultStore);
 
@@ -34,21 +34,8 @@ class SplotKnitModule extends AbstractModule
          * ADD OTHER STORES
          *****************************************************/
         foreach($stores as $name => $storeConfig) {
-            // prepare config array by fetching from config again to make sure proper exceptions are thrown if value not found
-            $storeConfigArray = array(
-                'host' => $config->get('stores.'. $name .'.host'),
-                'port' => null,
-                'user' => $config->get('stores.'. $name .'.user'),
-                'password' => $config->get('stores.'. $name .'.password'),
-                'database' => $config->get('stores.'. $name .'.database')
-            );
-            // port is not mandatory
-            try {
-                $storeConfigArray['port'] = $config->get('stores.'. $name .'.port');
-            } catch (NotFoundException $e) {}
-
             // instantiate
-            $store = new $storeConfig['class']($storeConfigArray['host'], $storeConfigArray['user'], $storeConfigArray['password'], $storeConfigArray['database'], $storeConfigArray['port']);
+            $store = new $storeConfig['class']($storeConfig);
             $store->setLogger($loggerFactory->create('Knit Store: '. $name));
 
             // register in Knit

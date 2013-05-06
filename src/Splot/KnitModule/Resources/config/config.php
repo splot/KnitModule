@@ -4,9 +4,9 @@ return array(
     'stores' => array(
         'default' => array(
             'class' => 'Knit\\Store\\MySQLStore',
-            'host' => 'localhost',
+            'hostname' => 'localhost',
             'port' => '',
-            'user' => '',
+            'username' => '',
             'password' => '',
             'database' => '',
         )
