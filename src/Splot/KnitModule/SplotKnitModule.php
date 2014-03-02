@@ -23,7 +23,7 @@ class SplotKnitModule extends AbstractModule
         $defaultStoreConfig = $stores['default'];
         unset($stores['default']);
         $defaultStore = new $defaultStoreConfig['class']($defaultStoreConfig);
-        $defaultStore->setLogger($logProvider->provide('Knit Default Store'));
+        $defaultStore->setLogger($logProvider->provideLogger('Knit Default Store'));
         $this->container->set('knit.stores.default', $defaultStore);
 
         // setup Knit and register it as a service
@@ -36,7 +36,7 @@ class SplotKnitModule extends AbstractModule
         foreach($stores as $name => $storeConfig) {
             // instantiate
             $store = new $storeConfig['class']($storeConfig);
-            $store->setLogger($logProvider->provide('Knit Store: '. $name));
+            $store->setLogger($logProvider->provideLogger('Knit Store: '. $name));
 
             // register in Knit
             $knit->registerStore($name, $store);
