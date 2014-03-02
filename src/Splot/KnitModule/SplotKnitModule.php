@@ -12,7 +12,7 @@ class SplotKnitModule extends AbstractModule
 
     public function boot() {
         $config = $this->getConfig();
-        $logProvider = $this->container->get('log_provider');
+        $logProvider = $this->container->get('logger_provider');
 
         /*****************************************************
          * SETUP KNIT
