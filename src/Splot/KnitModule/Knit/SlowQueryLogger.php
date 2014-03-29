@@ -76,7 +76,7 @@ class SlowQueryLogger extends AbstractLogger implements LoggerInterface
      * @return null
      */
     public function log($level, $message, array $context = array()) {
-        if ($enabled
+        if ($this->enabled
             && isset($context['executionTime'])
             && $context['executionTime'] >= $this->threshold
             && LogLevels::isLowerLevel($level, $this->raiseToLevel)

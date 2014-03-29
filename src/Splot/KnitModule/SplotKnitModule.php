@@ -38,7 +38,7 @@ class SplotKnitModule extends AbstractModule
                     $c->get('logger_provider')->provide('Knit Default Store'),
                     $config->get('slow_query_logger.enabled'),
                     $config->get('slow_query_logger.threshold'),
-                    $config->get('slow_query_logger.rase_to_level')
+                    $config->get('slow_query_logger.raise_to_level')
                 )
             );
         });
@@ -49,10 +49,10 @@ class SplotKnitModule extends AbstractModule
                 return new $storeConfig['class'](
                     $storeConfig,
                     new SlowQueryLogger(
-                        $c->get('logger_provider')->provide('Knit Store:'. $name)
+                        $c->get('logger_provider')->provide('Knit Store:'. $name),
                         $config->get('slow_query_logger.enabled'),
                         $config->get('slow_query_logger.threshold'),
-                        $config->get('slow_query_logger.rase_to_level')
+                        $config->get('slow_query_logger.raise_to_level')
                     )
                 );
             });
