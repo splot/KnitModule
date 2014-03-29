@@ -7,6 +7,7 @@ use Splot\Framework\Modules\AbstractModule;
 
 use Splot\KnitModule\Knit\EntityFinder;
 use Splot\KnitModule\Knit\Knit;
+use Splot\KnitModule\Knit\SlowQueryLogger;
 
 class SplotKnitModule extends AbstractModule
 {
@@ -30,19 +31,29 @@ class SplotKnitModule extends AbstractModule
         $defaultStoreConfig = $stores['default'];
         unset($stores['default']);
 
-        $this->container->set('knit.stores.default', function($c) use ($defaultStoreConfig) {
+        $this->container->set('knit.stores.default', function($c) use ($defaultStoreConfig, $config) {
             return new $defaultStoreConfig['class'](
                 $defaultStoreConfig,
-                $c->get('logger_provider')->provide('Knit Default Store')
+                new SlowQueryLogger(
+                    $c->get('logger_provider')->provide('Knit Default Store'),
+                    $config->get('slow_query_logger.enabled'),
+                    $config->get('slow_query_logger.threshold'),
+                    $config->get('slow_query_logger.rase_to_level')
+                )
             );
         });
 
         // register other stores
         foreach($stores as $name => $storeConfig) {
-            $this->container->set('knit.stores.'. $name, function($c) use ($name, $storeConfig) {
+            $this->container->set('knit.stores.'. $name, function($c) use ($name, $storeConfig, $config) {
                 return new $storeConfig['class'](
                     $storeConfig,
-                    $c->get('logger_provider')->provide('Knit Store:'. $name)
+                    new SlowQueryLogger(
+                        $c->get('logger_provider')->provide('Knit Store:'. $name)
+                        $config->get('slow_query_logger.enabled'),
+                        $config->get('slow_query_logger.threshold'),
+                        $config->get('slow_query_logger.rase_to_level')
+                    )
                 );
             });
         }

@@ -11,6 +11,8 @@
     ],
     "require": {
         "php": ">=5.3.3",
+        "psr/log": ">=1.0",
+        "michaldudek/foundation": "dev-master",
         "michaldudek/knit": "dev-master",
         "splot/framework": ">=0.6"
     },

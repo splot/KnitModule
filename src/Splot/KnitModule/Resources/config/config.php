@@ -1,5 +1,7 @@
 <?php
 
+use Psr\Log\LogLevel;
+
 return array(
     'stores' => array(
         'default' => array(
@@ -12,6 +14,12 @@ return array(
         )
     ),
 
-    'entities' => array()
+    'entities' => array(),
+
+    'slow_query_logger' => array(
+        'enabled' => true,
+        'threshold' => 0.5,
+        'raise_to_level' => LogLevel::NOTICE
+    )
 
 );
