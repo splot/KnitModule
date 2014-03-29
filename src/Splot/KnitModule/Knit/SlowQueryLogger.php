@@ -82,6 +82,8 @@ class SlowQueryLogger extends AbstractLogger implements LoggerInterface
             && LogLevels::isLowerLevel($level, $this->raiseToLevel)
         ) {
             $level = $this->raiseToLevel;
+            $message = 'Slow query took '. $context['executionTime'] .' s : '. $message;
+            $context['_tags'][] = 'slow_query';
         }
 
         // pass it to the real logger
