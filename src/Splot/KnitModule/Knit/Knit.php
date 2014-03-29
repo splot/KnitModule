@@ -1,4 +1,14 @@
 <?php
+/**
+ * Knit ORM bridge class that adds support for various Splot Framework specific features.
+ * 
+ * @package SplotKnitModule
+ * @subpackage Knit
+ * @author Michał Dudek <michal@michaldudek.pl>
+ * 
+ * @copyright Copyright (c) 2014, Michał Dudek
+ * @license MIT
+ */
 namespace Splot\KnitModule\Knit;
 
 use Knit\Store\StoreInterface;
@@ -28,6 +38,14 @@ class Knit extends BaseKnit
         $this->entityFinder = $entityFinder;
     }
 
+    /**
+     * Returns repository for the given entity.
+     *
+     * Supports module resource name syntax, ie. SomeModuleName:EntityName.
+     * 
+     * @param string $entityClass Class name (full, with namespace) of the entity.
+     * @return Repository
+     */
     public function getRepository($entityClass) {
         if (stripos($entityClass, ':')) {
             $entityClass = $this->entityFinder->expand($entityClass);

@@ -17,9 +17,22 @@ class EnsureIndexes extends AbstractCommand
         $knit = $this->get('knit');
 
         foreach($this->get('knit.entity_finder')->all() as $name) {
-            $this->writeln('Checking <info>'. $name .'</info>.');
+            $this->writeln('Checking <info>'. $name .'</info>');
+
             $repository = $knit->getRepository($name);
-            $repository->ensureIndexes();
+            
+            $indexes = $repository->ensureIndexes();
+
+            foreach($indexes as $name => $index) {
+                $indexName = is_string($name) ? $name : implode(', ', array_keys($index['properties']));
+                if ($index['status']) {
+                    $this->writeln('    Ensured index <comment>'. $indexName .'</comment>');
+                } else {
+                    $this->writeln('    <error>Could not create index on '. $indexName .'</comment>');
+                }
+            }
+
+            $this->writeln();
         }
     }
 
