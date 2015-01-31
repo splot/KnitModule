@@ -15,77 +15,69 @@ class SplotKnitModule extends AbstractModule
     protected $commandNamespace = 'knit';
 
     public function configure() {
-        $config = $this->getConfig();
-        $loggerProvider = $this->container->get('logger_provider');
+        parent::configure();
 
-        $this->container->set('knit.entity_finder', function($c) {
-            return new EntityFinder($c->get('application'));
-        });
+        $config = $this->getConfig();
+
+        foreach(array(
+            'slow_query_logger.enabled',
+            'slow_query_logger.threshold',
+            'slow_query_logger.raise_to_level'
+        ) as $key) {
+            $this->container->setParameter('knit.'. $key, $config->get($key));
+        }
 
         /*****************************************************
          * CONFIGURE KNIT STORES
          *****************************************************/
         $stores = $config->get('stores');
-
-        // setup the default store
-        $defaultStoreConfig = $stores['default'];
-        unset($stores['default']);
-
-        $this->container->set('knit.stores.default', function($c) use ($defaultStoreConfig, $config) {
-            return new $defaultStoreConfig['class'](
-                $defaultStoreConfig,
-                new SlowQueryLogger(
-                    $c->get('logger_provider')->provide('Knit Default Store'),
-                    $config->get('slow_query_logger.enabled'),
-                    $config->get('slow_query_logger.threshold'),
-                    $config->get('slow_query_logger.raise_to_level')
-                )
-            );
-        });
-
-        // register other stores
         foreach($stores as $name => $storeConfig) {
-            $this->container->set('knit.stores.'. $name, function($c) use ($name, $storeConfig, $config) {
-                return new $storeConfig['class'](
+            // register the store under its name
+            $this->container->register('knit.stores.'. $name, array(
+                'class' => $storeConfig['class'],
+                'arguments' => array(
                     $storeConfig,
-                    new SlowQueryLogger(
-                        $c->get('logger_provider')->provide('Knit Store:'. $name),
-                        $config->get('slow_query_logger.enabled'),
-                        $config->get('slow_query_logger.threshold'),
-                        $config->get('slow_query_logger.raise_to_level')
-                    )
-                );
-            });
+                    '@knit.stores.'. $name .'.slow_query_logger'
+                ),
+                'notify' => array(
+                    array('@knit', 'registerStore', array($name, '@'))
+                )
+            ));
+
+            // register the logger for this store
+            $this->container->register('knit.stores.'. $name .'.logger', array(
+                'factory' => array('@logger_provider', 'provide', array('Knit Store: '. $name))
+            ));
+
+            // register the wrapping slow query logger for this store
+            $this->container->register('knit.stores.'. $name .'.slow_query_logger', array(
+                'class' => 'Splot\\KnitModule\\Knit\\SlowQueryLogger',
+                'arguments' => array(
+                    '@knit.stores.'. $name .'.logger',
+                    '%knit.slow_query_logger.enabled%',
+                    '%knit.slow_query_logger.threshold%',
+                    '%knit.slow_query_logger.raise_to_level%'
+                )
+            ));
         }
+    }
 
-        /*****************************************************
-         * CONFIGURE KNIT ITSELF
-         *****************************************************/
+    public function run() {
+        parent::run();
+
+        $knit = $this->container->get('knit');
+
+        // configure entities
         $entities = $config->get('entities');
-        $this->container->set('knit', function($c) use ($stores, $entities) {
-            $knit = new Knit(
-                $c->get('knit.stores.default'),
-                $c->get('knit.entity_finder')
-            );
-
-            // register all configured stores
-            foreach($stores as $name => $storeConfig) {
-                $knit->registerStore($name, $c->get('knit.stores.'. $name));
+        foreach($entities as $entityClass => $entityConfig) {
+            if (isset($entityConfig['store'])) {
+                $knit->setStoreNameForEntity($entityClass, $entityConfig['store']);
             }
 
-            // configure entities
-            foreach($entities as $entityClass => $entityConfig) {
-                if (isset($entityConfig['store'])) {
-                    $knit->setStoreNameForEntity($entityClass, $entityConfig['store']);
-                }
-
-                if (isset($entityConfig['repository'])) {
-                    $knit->setRepositoryClassForEntity($entityClass, $entityConfig['repository']);
-                }
+            if (isset($entityConfig['repository'])) {
+                $knit->setRepositoryClassForEntity($entityClass, $entityConfig['repository']);
             }
-
-            return $knit;
-        });
+        }
     }
 
 }

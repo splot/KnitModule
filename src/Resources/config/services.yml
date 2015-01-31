@@ -1,0 +1,13 @@
+services:
+
+    knit:
+        class: Splot\KnitModule\Knit\Knit
+        arguments:
+            - @knit.stores.default
+            - @knit.entity_finder
+    
+    knit.entity_finder:
+        class: Splot\KnitModule\Knit\EntityFinder
+        arguments:
+            - @application
+
