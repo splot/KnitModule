@@ -12,13 +12,13 @@
     "require": {
         "php": ">=5.3.3",
         "psr/log": ">=1.0",
-        "michaldudek/foundation": "dev-master",
+        "michaldudek/foundation": ">=0.9",
         "michaldudek/knit": "dev-master",
-        "splot/framework": ">=0.6"
+        "splot/framework": ">=0.8"
     },
     "extra": {
         "branch-alias": {
-            "dev-master": "0.6.x-dev"
+            "dev-master": "0.8.x-dev"
         }
     },
     "minimum-stability": "dev",
