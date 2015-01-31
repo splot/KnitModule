@@ -23,6 +23,6 @@
     },
     "minimum-stability": "dev",
     "autoload": {
-        "psr-0": { "Splot\\KnitModule": "src/" }
+        "psr-4": { "Splot\\KnitModule\\": "src/" }
     }
 }
