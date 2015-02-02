@@ -43,11 +43,11 @@ class Knit extends BaseKnit
      *
      * Supports module resource name syntax, ie. SomeModuleName:EntityName.
      * 
-     * @param string $entityClass Class name (full, with namespace) of the entity.
+     * @param string|object $entityClass Class name (full, with namespace) of the entity, or an entity.
      * @return Repository
      */
     public function getRepository($entityClass) {
-        if (stripos($entityClass, ':')) {
+        if (is_string($entityClass) && stripos($entityClass, ':')) {
             $entityClass = $this->entityFinder->expand($entityClass);
         }
         
