@@ -3,6 +3,8 @@ namespace Splot\KnitModule;
 
 use MD\Foundation\Exceptions\NotFoundException;
 
+use Knit\Extensions\Softdeletable;
+
 use Splot\Framework\Modules\AbstractModule;
 
 use Splot\KnitModule\Knit\EntityFinder;
@@ -32,6 +34,10 @@ class SplotKnitModule extends AbstractModule
          *****************************************************/
         $stores = $config->get('stores');
         foreach($stores as $name => $storeConfig) {
+            $notify = $name === 'default' ? array() : array(
+                array('@knit', 'registerStore', array($name, '@'))
+            );
+
             // register the store under its name
             $this->container->register('knit.stores.'. $name, array(
                 'class' => $storeConfig['class'],
@@ -39,9 +45,7 @@ class SplotKnitModule extends AbstractModule
                     $storeConfig,
                     '@knit.stores.'. $name .'.slow_query_logger'
                 ),
-                'notify' => array(
-                    array('@knit', 'registerStore', array($name, '@'))
-                )
+                'notify' => $notify
             ));
 
             // register the logger for this store
@@ -67,8 +71,11 @@ class SplotKnitModule extends AbstractModule
 
         $knit = $this->container->get('knit');
 
+        // @todo fix this to use proper DI in services.yml when SplotDI fixes notify cirtucal reference issue
+        $knit->registerExtension('softdeletable', new Softdeletable($knit));
+
         // configure entities
-        $entities = $config->get('entities');
+        $entities = $this->getConfig()->get('entities');
         foreach($entities as $entityClass => $entityConfig) {
             if (isset($entityConfig['store'])) {
                 $knit->setStoreNameForEntity($entityClass, $entityConfig['store']);
