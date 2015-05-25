@@ -1,0 +1,15 @@
+stores:
+    default:
+        class: Knit\Store\MySQLStore
+        hostname: localhost
+        port: ~
+        username: ~
+        password: ~
+        database: ~
+
+entities: []
+
+slow_query_logger:
+    enabled: true
+    threshold: 0.5
+    raise_to_level: notice
