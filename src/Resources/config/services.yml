@@ -11,3 +11,11 @@ services:
         arguments:
             - @application
 
+    # extensions
+
+    knit.extension.softdeletable:
+        class: Knit\Extensions\Softdeletable
+        arguments:
+            - @knit
+        notify:
+            - ["@knit", "registerExtension", ["softdeletable", "@"]]

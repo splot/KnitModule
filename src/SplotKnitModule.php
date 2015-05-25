@@ -64,25 +64,19 @@ class SplotKnitModule extends AbstractModule
                 )
             ));
         }
-    }
 
-    public function run() {
-        parent::run();
+        /*****************************************************
+         * CONFIGURE ENTITIES
+         *****************************************************/
+        $knitDefinition = $this->container->getDefinition('knit');
 
-        $knit = $this->container->get('knit');
-
-        // @todo fix this to use proper DI in services.yml when SplotDI fixes notify cirtucal reference issue
-        $knit->registerExtension('softdeletable', new Softdeletable($knit));
-
-        // configure entities
-        $entities = $this->getConfig()->get('entities');
-        foreach($entities as $entityClass => $entityConfig) {
+        foreach($config->get('entities') as $entityClass => $entityConfig) {
             if (isset($entityConfig['store'])) {
-                $knit->setStoreNameForEntity($entityClass, $entityConfig['store']);
+                $knitDefinition->addMethodCall('setStoreNameForEntity', array($entityClass, $entityConfig['store']));
             }
 
             if (isset($entityConfig['repository'])) {
-                $knit->setRepositoryClassForEntity($entityClass, $entityConfig['repository']);
+                $knitDefinition->addMethodCall('setRepositoryClassForEntity', array($entityClass, $entityConfig['repository']));
             }
         }
     }
