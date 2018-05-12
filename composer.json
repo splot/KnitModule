@@ -13,7 +13,7 @@
         "php": ">=5.3.3",
         "psr/log": ">=1.0",
         "michaldudek/foundation": ">=0.9",
-        "michaldudek/knit": "dev-master",
+        "michaldudek/knit": "0.1.*@dev",
         "splot/framework": ">=0.8"
     },
     "extra": {
